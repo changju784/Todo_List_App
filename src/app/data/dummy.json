@@ -1,0 +1,17 @@
+[
+    {
+        "id": "1",
+        "name": "laundry",
+        "isDone": true
+    },
+    {
+        "id": "2",
+        "name": "dish washing",
+        "isDone": false
+    },
+    {
+        "id": "3",
+        "name": "cooking",
+        "isDone": true
+    }
+]
