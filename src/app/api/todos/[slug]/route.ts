@@ -1,21 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
+import { fetchATodo, deleteATodo, updateATodo } from "@/data/firestore";
 
 // Get a single task by Id
 export async function GET(request: NextRequest, 
     { params }: {params: {slug: string}}) {
     const searchParams = request.nextUrl.searchParams;
-
-    const search = searchParams.get('search');
+    const query = searchParams.get('search');
+    const fetchedTodo = await fetchATodo(params.slug);
+    if (fetchedTodo === null) {
+        return new Response(null, { status: 204 })
+    }
 
     const response = {
-        message: 'Successfully retrieved single task',
+        message: 'Successfully retrieved a single task',
         type: "Single",
-        data: {
-            id: params.slug,
-            name: "Some task",
-            isDone: true,  
-            query: search
-        }
+        data: fetchedTodo
     }
     return NextResponse.json(response, {status: 200});
 }
@@ -25,36 +24,34 @@ export async function POST(request: NextRequest,
     { params }: {params: {slug: string}}) {
 
     const { name, isDone } = await request.json(); 
-    const newTodo = { 
-        id: params.slug,
-        name: name, 
-        isDone: isDone, 
+    const updatedTodo = await updateATodo(params.slug, { name, isDone });
+
+     if (updatedTodo === null) {
+        return new Response(null, { status: 204 })
     }
+
     const response = {
         message: "Successfully edited new task",
         type: "Single",
-        data: newTodo,
+        data: updatedTodo,
     }
-    const data = await request.json()
+
     return Response.json(response, {status: 200});
 }
 
 // Delete a single task by id
 export async function DELETE(request: NextRequest,
     { params }: {params: {slug: string}}) {
-    const searchParams = request.nextUrl.searchParams;
+    const deletedTodo = await deleteATodo(params.slug);
 
-    const search = searchParams.get('search');
+    if (deletedTodo === null) {
+        return new Response(null, { status: 204 })
+    }
 
     const response = {
         message: 'Successfully deleted single task',
         type: "Single",
-        data: {
-            id: params.slug,
-            name: "Some task",
-            isDone: true,  
-            query: search
-        }
+        data: deletedTodo
     }
     return NextResponse.json(response, {status: 200});
 }
